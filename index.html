@@ -77,6 +77,13 @@
             transition: 0.3s;
         }
 
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
         .menu-btn {
             font-size: 24px;
             background: var(--primary-color);
@@ -85,7 +92,24 @@
             padding: 10px 15px;
             border-radius: 8px;
             cursor: pointer;
-            margin-bottom: 20px;
+        }
+
+        .share-btn {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .share-btn img {
+            width: 24px;
+            height: 24px;
         }
 
         .page { display: none; max-width: 600px; margin: 0 auto; }
@@ -156,9 +180,9 @@
             box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
 
-        /* --- Scrollbar for Sidebar --- */
-        #sidebar::-webkit-scrollbar { width: 5px; }
-        #sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
+        @media (max-width: 768px) {
+            .count-btn { width: 200px; height: 200px; font-size: 2.5em; }
+        }
     </style>
 </head>
 <body>
@@ -178,14 +202,19 @@
     </div>
 
     <div id="main-content">
-        <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+        <div class="header-row">
+            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+            <div class="share-btn" onclick="shareApp()">
+                <img src="share.png" alt="Share">
+            </div>
+        </div>
 
         <div id="home" class="page active">
             <div class="card" style="text-align:center;">
                 <div id="hijri-date" style="color: var(--accent-color); font-weight: bold; font-size: 1.2em;">Wednesday, Shaʻban 23, 1447 AH</div>
                 <div id="clock" style="font-size: 3em; font-weight: bold; margin: 10px 0;">00:00:00</div>
                 <table class="prayer-table" id="home-prayer-list"></table>
-                <button class="btn-full" style="background: #f39c12;" onclick="dailyReset()">Daily Reset</button>
+                <button class="btn-full" style="background: #f39c12;" onclick="dailyReset()">Daily Reset Progress</button>
             </div>
         </div>
 
@@ -226,51 +255,32 @@
                 <input type="color" id="theme-picker" onchange="updateTheme(this.value)" style="height:50px;">
                 
                 <h3 style="margin-top:20px;">Adhan Settings</h3>
-                <select id="adhan-select" onchange="previewAdhan(this.value)">
+                <select id="adhan-select">
                     <option value="adhan1.mp3">Adhan Voice 1</option>
                     <option value="adhan2.mp3">Adhan Voice 2</option>
                     <option value="adhan3.mp3">Adhan Voice 3</option>
                 </select>
                 
-                <h3>Edit Local Times (Rawalpindi)</h3>
+                <h3>Edit Local Times</h3>
                 <div id="edit-times"></div>
                 <button class="btn-full" onclick="saveNewTimes()">Save Local Times</button>
             </div>
         </div>
 
-        <div id="guide" class="page">
-            <div class="card guide-section">
+	    <div id="guide" class="page">
+            <div class="card">
                 <h2>📖 How to Use</h2>
+                <h3>📱 Navigation & Menu</h3>
+                <p>Tap ☰ Menu to switch pages. If the menu is too long on your phone, you can scroll down inside it. The app is signed <b>"made by Ammar Ali"</b> at the bottom.</p>
                 
-                <h3>📱 Getting Around (Menu)</h3>
-                <ul>
-                    <li><b>Open Menu:</b> Tap the ☰ Menu button at the top left.</li>
-                    <li><b>Android Tip:</b> If the menu looks long, swipe up/down inside the sidebar. You'll see "made by Ammar Ali" at the bottom.</li>
-                </ul>
-
-                <h3>🕌 Namaz Tracker & Adhan</h3>
-                <ul>
-                    <li><b>Tracking:</b> Check the boxes in the Namaz tab when you pray.</li>
-                    <li><b>Adhan:</b> It plays automatically at prayer times. Tap the screen once after opening the app to enable audio.</li>
-                </ul>
-
-                <h3>📿 Smart Tasbeeh Counter</h3>
-                <ul>
-                    <li><b>Add:</b> Enter name and goal. Tap "Add".</li>
-                    <li><b>Count:</b> Tap your Tasbeeh to open the big COUNT button.</li>
-                    <li><b>Auto Mode:</b> Counts automatically every 2 seconds.</li>
-                </ul>
-
-                <h3>☀️ Azkar Tab</h3>
-                <ul>
-                    <li>Store your morning/evening Duas here. Tap "Add to List" to save.</li>
-                </ul>
-
-                <h3>⚙️ Settings & Theme</h3>
-                <ul>
-                    <li><b>Adjust Times:</b> Change Fajr, Dhuhr, etc., to match your mosque.</li>
-                    <li><b>Theme:</b> Change colors and preview different Adhan voices.</li>
-                </ul>
+                <h3>📿 Tasbeeh Counter</h3>
+                <p><b>Adding:</b> Type the name and goal. <b>Counting:</b> Tap your Tasbeeh to open the large "COUNT" button. <b>Goal Sound:</b> A sound plays ONLY when you hit your target. <b>Auto Mode:</b> Taps for you every 2 seconds.</p>
+                
+                <h3>🕌 Adhan System</h3>
+                <p>The app plays Adhan automatically at the set times. Use <b>Settings</b> to preview voices or manually adjust Fajr, Dhuhr, etc., times to match your mosque.</p>
+                
+                <h3>🏠 Home Dashboard</h3>
+                <p>View your Hijri date and live clock here. Use <b>Reset Daily Progress</b> to set your counters back to zero for a new day without deleting your Tasbeeh names.</p>
             </div>
         </div>
     </div>
@@ -286,7 +296,6 @@
     </div>
 
     <script>
-        // Data Management
         let data = JSON.parse(localStorage.getItem('muslimAppData')) || {
             theme: '#27ae60',
             prayers: [
@@ -305,8 +314,16 @@
 
         function save() { localStorage.setItem('muslimAppData', JSON.stringify(data)); }
 
-        // Sidebar & Navigation
+        function shareApp() {
+            if (navigator.share) {
+                navigator.share({ title: 'Muslim Assistant', text: 'Check out this app made by Ammar Ali!', url: window.location.href });
+            } else {
+                alert("Link copied to clipboard: " + window.location.href);
+            }
+        }
+
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+        
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
@@ -317,62 +334,37 @@
             if(window.innerWidth < 768) toggleSidebar();
         }
 
-        // Home & Clock
         function updateClock() {
             const now = new Date();
             const timeStr = now.toLocaleTimeString('en-GB');
             document.getElementById('clock').innerText = timeStr;
-            
-            // Auto Adhan Trigger
             if(now.getSeconds() === 0) {
                 const cur = timeStr.substring(0, 5);
-                data.prayers.forEach(p => { if(p.time === cur) playAdhan(); });
+                data.prayers.forEach(p => { if(p.time === cur) new Audio(document.getElementById('adhan-select').value).play().catch(()=>{}); });
             }
         }
         setInterval(updateClock, 1000);
 
-        function playAdhan() {
-            const src = document.getElementById('adhan-select').value;
-            new Audio(src).play().catch(() => console.log("Sound blocked by browser"));
-        }
-
-        function previewAdhan(src) {
-            const a = new Audio(src); a.play();
-            setTimeout(() => { a.pause(); a.currentTime = 0; }, 5000);
-        }
-
-        // Namaz Logic
         function renderNamaz() {
             const container = document.getElementById('namaz-items');
             container.innerHTML = data.prayers.map((p, i) => `
                 <div class="namaz-row">
-                    <span>${p.name} ${p.type==='extra'?'(Nafl)':''}</span>
+                    <span>${p.name} ${p.type==='extra'?'(Extra)':''}</span>
                     <div>
-                        <input type="checkbox" style="width:25px; height:25px;" ${p.done?'checked':''} onchange="toggleCheck(${i})">
+                        <input type="checkbox" style="width:25px; height:25px;" ${p.done?'checked':''} onchange="data.prayers[${i}].done=!data.prayers[${i}].done; save()">
                         ${p.type==='extra'? `<button onclick="deleteExtra(${i})" style="background:red; padding:2px 8px; margin-left:10px;">X</button>` : ''}
                     </div>
                 </div>
             `).join('');
-            
-            // Home Table
-            document.getElementById('home-prayer-list').innerHTML = data.prayers
-                .filter(p => p.type === 'farz')
-                .map(p => `<tr><td>${p.name}</td><td align="right">${p.time}</td></tr>`).join('');
+            document.getElementById('home-prayer-list').innerHTML = data.prayers.filter(p=>p.type==='farz').map(p=>`<tr><td>${p.name}</td><td align="right">${p.time}</td></tr>`).join('');
         }
 
-        function toggleCheck(i) { data.prayers[i].done = !data.prayers[i].done; save(); }
-        
         function addExtraNamaz() {
             const name = document.getElementById('extra-name').value;
-            if(!name) return;
-            data.prayers.push({name, time: '--:--', done: false, type: 'extra'});
-            document.getElementById('extra-name').value = '';
-            save(); renderNamaz();
+            if(name) { data.prayers.push({name, time: '--:--', done: false, type: 'extra'}); save(); renderNamaz(); document.getElementById('extra-name').value=''; }
         }
-        
         function deleteExtra(i) { data.prayers.splice(i,1); save(); renderNamaz(); }
 
-        // Tasbeeh Logic
         function renderTasbeehs() {
             const list = document.getElementById('tasbeeh-list');
             list.innerHTML = data.tasbeehs.map((t, i) => `
@@ -380,108 +372,54 @@
                     <b>${t.name}</b>
                     <span>${t.count} / ${t.goal}</span>
                     <button onclick="deleteTasbeeh(${i}, event)" style="background:red;">Delete</button>
-                </div>
-            `).join('');
+                </div>`).join('');
         }
-
         function addTasbeeh() {
-            const name = document.getElementById('t-name').value;
-            const goal = document.getElementById('t-goal').value;
-            if(!name || !goal) return;
-            data.tasbeehs.push({name, goal, count: 0});
-            document.getElementById('t-name').value = '';
-            document.getElementById('t-goal').value = '';
-            save(); renderTasbeehs();
+            const name = document.getElementById('t-name').value, goal = document.getElementById('t-goal').value;
+            if(name && goal) { data.tasbeehs.push({name, goal, count: 0}); save(); renderTasbeehs(); document.getElementById('t-name').value=''; document.getElementById('t-goal').value=''; }
         }
-
         function openCounter(i) {
             activeIdx = i;
             document.getElementById('active-t-name').innerText = data.tasbeehs[i].name;
             document.getElementById('active-t-count').innerText = data.tasbeehs[i].count;
             document.getElementById('active-counter').style.display = 'flex';
         }
-
         function incrementCount() {
             data.tasbeehs[activeIdx].count++;
             document.getElementById('active-t-count').innerText = data.tasbeehs[activeIdx].count;
-            if(data.tasbeehs[activeIdx].count == data.tasbeehs[activeIdx].goal) {
-                alert("Goal Reached!");
-                if(autoTimer) toggleAutoMode();
-            }
+            if(data.tasbeehs[activeIdx].count == data.tasbeehs[activeIdx].goal) { alert("Goal Reached!"); if(autoTimer) toggleAutoMode(); }
         }
-
         function toggleAutoMode() {
             const btn = document.getElementById('auto-btn');
-            if(autoTimer) {
-                clearInterval(autoTimer); autoTimer = null;
-                btn.innerText = "Auto Mode"; btn.style.background = "#3498db";
-            } else {
-                autoTimer = setInterval(incrementCount, 2000);
-                btn.innerText = "STOP AUTO"; btn.style.background = "red";
-            }
+            if(autoTimer) { clearInterval(autoTimer); autoTimer = null; btn.innerText = "Auto Mode"; btn.style.background = "#3498db"; }
+            else { autoTimer = setInterval(incrementCount, 2000); btn.innerText = "STOP AUTO"; btn.style.background = "red"; }
         }
-
-        function closeCounter() {
-            if(autoTimer) toggleAutoMode();
-            save(); renderTasbeehs();
-            document.getElementById('active-counter').style.display = 'none';
-        }
-
+        function closeCounter() { if(autoTimer) toggleAutoMode(); save(); renderTasbeehs(); document.getElementById('active-counter').style.display = 'none'; }
         function deleteTasbeeh(i, e) { e.stopPropagation(); data.tasbeehs.splice(i, 1); save(); renderTasbeehs(); }
 
-        // Azkar Logic
         function renderAzkar() {
-            document.getElementById('azkar-list').innerHTML = data.azkars.map((a, i) => `
-                <div class="card" style="display:flex; justify-content:space-between;">
-                    <span>${a}</span>
-                    <button onclick="data.azkars.splice(${i},1); save(); renderAzkar();" style="background:red">X</button>
-                </div>
-            `).join('');
+            document.getElementById('azkar-list').innerHTML = data.azkars.map((a, i) => `<div class="card" style="display:flex; justify-content:space-between;"><span>${a}</span><button onclick="data.azkars.splice(${i},1); save(); renderAzkar();" style="background:red">X</button></div>`).join('');
         }
         function addAzkar() {
             const val = document.getElementById('azkar-input').value;
-            if(!val) return;
-            data.azkars.push(val);
-            document.getElementById('azkar-input').value = '';
-            save(); renderAzkar();
+            if(val) { data.azkars.push(val); document.getElementById('azkar-input').value=''; save(); renderAzkar(); }
         }
 
-        // Settings Logic
         function renderSettings() {
-            const editBox = document.getElementById('edit-times');
-            editBox.innerHTML = data.prayers.filter(p => p.type==='farz').map((p, i) => `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-                    <span>${p.name}</span>
-                    <input type="time" id="time-${i}" value="${p.time}" style="width:120px;">
-                </div>
-            `).join('');
+            document.getElementById('edit-times').innerHTML = data.prayers.filter(p=>p.type==='farz').map((p, i) => `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>${p.name}</span><input type="time" id="time-${i}" value="${p.time}" style="width:120px;"></div>`).join('');
             document.getElementById('theme-picker').value = data.theme;
         }
-
         function saveNewTimes() {
-            data.prayers.filter(p => p.type==='farz').forEach((p, i) => {
-                p.time = document.getElementById(`time-${i}`).value;
-            });
+            data.prayers.filter(p=>p.type==='farz').forEach((p, i) => { p.time = document.getElementById(`time-${i}`).value; });
             save(); renderNamaz(); alert("Settings Saved!");
         }
+        function updateTheme(color) { data.theme = color; document.documentElement.style.setProperty('--primary-color', color); save(); }
+        function dailyReset() { if(confirm("Reset progress?")) { data.prayers.forEach(p=>p.done=false); data.tasbeehs.forEach(t=>t.count=0); save(); renderNamaz(); renderTasbeehs(); } }
 
-        function updateTheme(color) {
-            data.theme = color;
-            document.documentElement.style.setProperty('--primary-color', color);
-            save();
-        }
-
-        function dailyReset() {
-            if(confirm("Reset today's counts?")) {
-                data.prayers.forEach(p => p.done = false);
-                data.tasbeehs.forEach(t => t.count = 0);
-                save(); renderNamaz(); alert("Daily progress reset!");
-            }
-        }
-
-        // Init
         document.documentElement.style.setProperty('--primary-color', data.theme);
         renderNamaz();
+        renderTasbeehs();
+        renderAzkar();
     </script>
 </body>
 </html>
