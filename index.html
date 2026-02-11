@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muslim Assistant - Ammar Ali</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #27ae60;
+            --delete-color: #e74c3c;
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            display: flex;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: 0.3s;
+        }
+
+        /* Sidebar Navigation */
+        #sidebar {
+            width: 260px;
+            height: 100vh;
+            background: var(--primary-color);
+            color: white;
+            position: fixed;
+            left: 0;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+        }
+
+        #sidebar.closed {
+            left: -260px;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            font-size: 1.5em;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .close-btn {
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+        }
+
+        .nav-menu {
+            flex-grow: 1;
+            padding-top: 20px;
+        }
+
+        .nav-item {
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: block;
+            text-decoration: none;
+            color: white;
+        }
+
+        .nav-item:hover {
+            background: var(--accent-color);
+        }
+
+        .made-by {
+            padding: 20px;
+            font-size: 0.85em;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            font-style: italic;
+        }
+
+        /* Main Content */
+        #main-content {
+            flex-grow: 1;
+            margin-left: 260px;
+            padding: 20px;
+            transition: 0.3s;
+            min-height: 100vh;
+        }
+
+        #main-content.full-width {
+            margin-left: 0;
+        }
+
+        .menu-open-btn {
+            font-size: 24px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .page {
+            display: none;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .islamic-date-display {
+            font-size: 1.2em;
+            color: var(--accent-color);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* Tasbeeh UI */
+        .tasbeeh-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            direction: rtl;
+        }
+
+        .arabic-text {
+            font-size: 1.4em;
+            font-weight: bold;
+            flex-grow: 1;
+            text-align: right;
+            margin-right: 15px;
+        }
+
+        .counter-controls {
+            direction: ltr;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .namaz-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            background: #fff;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+
+        .btn-delete {
+            background: var(--delete-color);
+            padding: 5px 10px;
+            font-size: 0.8em;
+            margin-left: 10px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-reset {
+            background: #f39c12;
+            margin-top: 15px;
+            width: 100%;
+            font-weight: bold;
+        }
+
+        button {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: none;
+            background: var(--accent-color);
+            color: white;
+            cursor: pointer;
+        }
+
+        input[type="text"], input[type="number"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .guide-section h3 {
+            margin-top: 25px;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--accent-color);
+            display: inline-block;
+        }
+
+        @media (max-width: 768px) {
+            #sidebar { width: 100%; left: -100%; }
+            #sidebar.active { left: 0; }
+            #main-content { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar">
+        <div class="sidebar-header">
+            <span>Menu</span>
+            <button class="close-btn" onclick="toggleSidebar()">✖</button>
+        </div>
+        <div class="nav-menu">
+            <div class="nav-item" onclick="showPage('home')">🏠 Home</div>
+            <div class="nav-item" onclick="showPage('tasbeeh')">📿 Tasbeeh</div>
+            <div class="nav-item" onclick="showPage('namaz')">🕌 Namaz Tracker</div>
+            <div class="nav-item" onclick="showPage('azkar')">☀️ Azkar</div>
+            <div class="nav-item" onclick="showPage('settings')">⚙️ Settings</div>
+            <div class="nav-item" onclick="showPage('guide')">📖 How to Use</div>
+        </div>
+        <div class="made-by">made by Ammar Ali</div>
+    </div>
+
+    <div id="main-content">
+        <button class="menu-open-btn" onclick="toggleSidebar()">☰ Menu</button>
+
+        <div id="home" class="page active">
+            <h1>Welcome to Muslim Assistant</h1>
+            <div class="card">
+                <div id="hijri-date" class="islamic-date-display">Loading Islamic Date...</div>
+                <h3>Daily Summary</h3>
+                <p id="home-namaz-stat">Namaz Progress: 0 Completed</p>
+                <p id="home-tasbeeh-stat">Recent Tasbeeh: None</p>
+                <button class="btn-reset" onclick="resetProgress()">Reset Daily Progress (Counters & Ticks)</button>
+            </div>
+        </div>
+
+        <div id="tasbeeh" class="page">
+            <h2>Tasbeeh Counter</h2>
+            <div class="card">
+                <input type="text" id="t-name" placeholder="Arabic Text (e.g. سبحان الله)">
+                <input type="number" id="t-goal" placeholder="Goal (e.g. 500)">
+                <button onclick="addNewTasbeeh()">Add Tasbeeh</button>
+            </div>
+            <div id="tasbeeh-container"></div>
+            
+            <div id="active-counter" class="card" style="display:none; text-align: center;">
+                <h2 id="active-arabic" class="arabic-text" style="text-align:center"></h2>
+                <h1 id="count-display" style="font-size: 3em;">0</h1>
+                <p>Time for last lap: <span id="lap-time">0</span>s</p>
+                <button onclick="countUp()" style="padding: 20px 40px; font-size: 1.5em; width: 100%;">COUNT</button>
+                <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+                    <button onclick="toggleAuto()">Auto Mode</button>
+                    <button onclick="stopTasbeeh()">Stop & Save</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="namaz" class="page">
+            <h2>Namaz Tracker</h2>
+            <div id="namaz-container" class="card"></div>
+            <div class="card">
+                <h3>Add Extra Prayer</h3>
+                <input type="text" id="extra-namaz-name" placeholder="Prayer Name (e.g. Tahajjud)">
+                <button onclick="addExtraNamaz()">Add</button>
+            </div>
+        </div>
+
+        <div id="azkar" class="page">
+            <h2>Morning & Evening Azkars</h2>
+            <div class="card">
+                <input type="text" id="azkar-input" placeholder="Enter Azkar...">
+                <button onclick="addAzkar()">Add Azkar</button>
+            </div>
+            <div id="azkar-list"></div>
+        </div>
+
+        <div id="settings" class="page">
+            <h2>Settings</h2>
+            <div class="card">
+                <label>Adhan Voice:</label>
+                <select id="azan-voice" onchange="previewAdhan(this.value)">
+                    <option value="azan1.mp3">Adhan 1</option>
+                    <option value="azan2.mp3">Adhan 2</option>
+                    <option value="azan3.mp3">Adhan 3</option>
+                </select>
+                <br><br>
+                <label>Theme Color:</label>
+                <input type="color" id="theme-color" onchange="applyTheme(this.value)">
+            </div>
+        </div>
+
+        <div id="guide" class="page">
+            <h2>📖 How to Use</h2>
+            <div class="card guide-section">
+                <h3>📱 Navigation & Menu</h3>
+                <ul>
+                    <li><strong>Opening the Menu:</strong> Tap the ☰ Menu button at the top left to see all your pages.</li>
+                    <li><strong>Closing the Menu:</strong> Tap the ✖ inside the menu or click the menu button again to hide it and see the full screen.</li>
+                    <li><strong>Signature:</strong> You will see "made by Ammar Ali" at the very bottom of the sidebar.</li>
+                </ul>
+
+                <h3>📿 Tasbeeh Counter</h3>
+                <ul>
+                    <li><strong>Adding:</strong> Go to the Tasbeeh page, type the Arabic name (e.g., SubhanAllah), set your goal (e.g., 100), and click Add.</li>
+                    <li><strong>Reciting:</strong> Tap on any Tasbeeh in your list. A large counting screen will open.</li>
+                    <li><strong>Manual Count:</strong> Tap the big COUNT button every time you recite.</li>
+                    <li><strong>Automatic Mode:</strong> Tap Auto Mode to let the app count for you (every 2 seconds). This continues even if you switch to other pages in the app.</li>
+                    <li><strong>Tracking Time:</strong> The app automatically shows "Time for last lap," telling you exactly how many seconds it took to read that specific Tasbeeh once.</li>
+                    <li><strong>Goal Alert:</strong> Once you reach your set number (e.g., 500), an alert will pop up.</li>
+                </ul>
+
+                <h3>🕌 Namaz Tracker</h3>
+                <ul>
+                    <li><strong>Obligatory Prayers:</strong> Fajr, Dhuhr, Asr, Maghrib, and Isha are already there. Just Tick the box once you finish the prayer.</li>
+                    <li><strong>Nafli/Extra Prayers:</strong> If you want to track Tahajjud or Ishraq, type the name in the "Add Extra Prayer" box.</li>
+                    <li><strong>Removing Extra:</strong> You can delete any Nafli prayer by clicking the red X next to it.</li>
+                    <li><strong>Adhan:</strong> When it is time for prayer, ensure your volume is up. You can change which Adhan plays in the Settings.</li>
+                </ul>
+
+                <h3>☀️ Azkar & Settings</h3>
+                <ul>
+                    <li><strong>Azkar:</strong> Use this section to write down your Morning and Evening Azkars. You can delete them anytime with the Delete button.</li>
+                    <li><strong>Settings:</strong> Change Adhan voice or use the color box to change the theme color.</li>
+                </ul>
+
+                <h3>🏠 Home Page</h3>
+                <ul>
+                    <li><strong>Dashboard:</strong> Every time you tick a prayer or update a Tasbeeh, the Daily Summary updates automatically.</li>
+                    <li><strong>Reset Button:</strong> Clears current ticks and recited counts to 0 for a new day, but keeps your saved Tasbeeh names and Azkars.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tasbeehs = [];
+        let azkars = [];
+        let prayers = [
+            {id: 'fajr', name: 'Fajr', done: false, type: 'obligatory'},
+            {id: 'dhuhr', name: 'Dhuhr', done: false, type: 'obligatory'},
+            {id: 'asr', name: 'Asr', done: false, type: 'obligatory'},
+            {id: 'maghrib', name: 'Maghrib', done: false, type: 'obligatory'},
+            {id: 'isha', name: 'Isha', done: false, type: 'obligatory'}
+        ];
+        
+        let activeTIndex = null;
+        let count = 0;
+        let autoInterval = null;
+        let startTime = null;
+
+        function updateIslamicDate() {
+            const date = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const hijri = new Intl.DateTimeFormat('en-u-ca-islamic-uma-nu-latn', options).format(date);
+            document.getElementById('hijri-date').innerText = hijri;
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('closed');
+            document.getElementById('main-content').classList.toggle('full-width');
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            updateHomeStats();
+        }
+
+        function resetProgress() {
+            if(confirm("Reset all recited counts and prayer ticks? (Saved names will remain)")) {
+                prayers.forEach(p => p.done = false);
+                tasbeehs.forEach(t => t.count = 0);
+                renderNamaz();
+                renderTasbeehs();
+                updateHomeStats();
+            }
+        }
+
+        function previewAdhan(fileName) {
+            const audio = new Audio(fileName);
+            audio.play().catch(e => console.log("File not found"));
+            setTimeout(() => { audio.pause(); audio.currentTime = 0; }, 5000);
+        }
+
+        function addNewTasbeeh() {
+            const name = document.getElementById('t-name').value;
+            const goal = parseInt(document.getElementById('t-goal').value) || 0;
+            if(!name) return;
+            tasbeehs.push({ name, goal, count: 0 });
+            document.getElementById('t-name').value = '';
+            document.getElementById('t-goal').value = '';
+            renderTasbeehs();
+        }
+
+        function deleteTasbeeh(index, event) {
+            event.stopPropagation();
+            tasbeehs.splice(index, 1);
+            renderTasbeehs();
+        }
+
+        function renderTasbeehs() {
+            const container = document.getElementById('tasbeeh-container');
+            container.innerHTML = '';
+            tasbeehs.forEach((t, index) => {
+                container.innerHTML += `
+                    <div class="tasbeeh-row card" onclick="openCounter(${index})">
+                        <button class="btn-delete" onclick="deleteTasbeeh(${index}, event)">Delete</button>
+                        <div class="counter-controls">
+                            <span>${t.count} / ${t.goal}</span>
+                        </div>
+                        <span class="arabic-text">${t.name}</span>
+                    </div>
+                `;
+            });
+        }
+
+        function openCounter(index) {
+            activeTIndex = index;
+            count = tasbeehs[index].count;
+            document.getElementById('tasbeeh-container').style.display = 'none';
+            document.getElementById('active-counter').style.display = 'block';
+            document.getElementById('active-arabic').innerText = tasbeehs[index].name;
+            document.getElementById('count-display').innerText = count;
+            startTime = Date.now();
+        }
+
+        function countUp() {
+            count++;
+            let now = Date.now();
+            document.getElementById('lap-time').innerText = ((now - startTime) / 1000).toFixed(2);
+            startTime = now;
+            document.getElementById('count-display').innerText = count;
+            
+            if(count === parseInt(tasbeehs[activeTIndex].goal)) {
+                const goalAudio = new Audio('alert.mp3'); 
+                goalAudio.play().catch(e => alert("Goal Reached!"));
+                if(autoInterval) toggleAuto();
+            }
+        }
+
+        function toggleAuto() {
+            if(autoInterval) { clearInterval(autoInterval); autoInterval = null; }
+            else { autoInterval = setInterval(countUp, 2000); }
+        }
+
+        function stopTasbeeh() {
+            tasbeehs[activeTIndex].count = count;
+            clearInterval(autoInterval);
+            document.getElementById('tasbeeh-container').style.display = 'block';
+            document.getElementById('active-counter').style.display = 'none';
+            renderTasbeehs();
+        }
+
+        function renderNamaz() {
+            const container = document.getElementById('namaz-container');
+            container.innerHTML = '';
+            prayers.forEach((p, index) => {
+                container.innerHTML += `
+                    <div class="namaz-item">
+                        <span>${p.name}</span>
+                        <div>
+                            <input type="checkbox" ${p.done ? 'checked' : ''} onchange="toggleNamaz(${index})">
+                            ${p.type === 'nafl' ? `<button class="btn-delete" onclick="deleteNamaz(${index})">×</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function deleteNamaz(index) { prayers.splice(index, 1); renderNamaz(); }
+        function toggleNamaz(index) { prayers[index].done = !prayers[index].done; updateHomeStats(); }
+        function addExtraNamaz() {
+            const name = document.getElementById('extra-namaz-name').value;
+            if(name) { prayers.push({ id: Date.now(), name, done: false, type: 'nafl' }); renderNamaz(); }
+        }
+
+        function addAzkar() {
+            const val = document.getElementById('azkar-input').value;
+            if(val) { azkars.push(val); document.getElementById('azkar-input').value = ''; renderAzkars(); }
+        }
+
+        function deleteAzkar(index) { azkars.splice(index, 1); renderAzkars(); }
+
+        function renderAzkars() {
+            const list = document.getElementById('azkar-list');
+            list.innerHTML = '';
+            azkars.forEach((a, index) => {
+                list.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>${a}</span>
+                    <button class="btn-delete" onclick="deleteAzkar(${index})">Delete</button>
+                </div>`;
+            });
+        }
+
+        function applyTheme(color) { document.documentElement.style.setProperty('--primary-color', color); }
+
+        function updateHomeStats() {
+            const done = prayers.filter(p => p.done).length;
+            document.getElementById('home-namaz-stat').innerText = `Namaz Progress: ${done} Completed`;
+        }
+
+        updateIslamicDate();
+        renderNamaz();
+    </script>
+</body>
+</html>
