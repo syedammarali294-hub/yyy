@@ -2,424 +2,379 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Muslim Assistant - Ammar Ali</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Deen Companion v1.1</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
     <style>
+        /* // THEME VARIABLES */
         :root {
-            --primary-color: #2c3e50;
-            --accent-color: #27ae60;
-            --bg-color: #f4f7f6;
-            --text-color: #333;
+            --p: #1b5e20;
+            --p-soft: #e8f5e9;
+            --accent: #ffd700;
+            --bg: #f4f7f5;
+            --surface: #ffffff;
+            --text: #1a1c1e;
+            --text-l: #6c757d;
+            --border: #e0e6e2;
+            --shadow: 0 8px 30px rgba(0,0,0,0.05);
+            --radius: 24px;
+            --grad: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
         }
 
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            margin: 0;
-            display: flex;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            min-height: 100vh;
-            overflow-x: hidden;
+        .dark-mode {
+            --bg: #121412;
+            --surface: #1e211e;
+            --text: #f5f6fa;
+            --text-l: #a0a8a0;
+            --border: #2c302c;
+            --p-soft: #1b2e1b;
         }
 
-        /* --- Sidebar --- */
-        #sidebar {
-            width: 260px;
-            height: 100dvh;
-            background: var(--primary-color);
-            color: white;
-            position: fixed;
-            left: -260px;
-            top: 0;
-            transition: 0.3s;
-            display: flex;
-            flex-direction: column;
-            z-index: 1001;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
-            overflow-y: auto;
-        }
+        /* // BASE STYLES */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; transition: background 0.3s, color 0.3s; }
+        body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+        .rtl { direction: rtl; font-family: 'Amiri', serif; }
 
-        #sidebar.open { left: 0; }
+        #app { height: 100vh; display: flex; flex-direction: column; position: relative; }
+        header { padding: 15px 20px; background: var(--surface); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); z-index: 100; }
+        .brand h1 { margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--p); }
 
-        .sidebar-header {
-            padding: 20px;
-            font-size: 1.4em;
-            font-weight: bold;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        main { flex: 1; overflow-y: auto; padding: 20px 20px 110px 20px; scroll-behavior: smooth; }
+        .view { display: none; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .view.active { display: block; }
+        
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .nav-item {
-            padding: 18px 25px;
-            cursor: pointer;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            transition: 0.2s;
-        }
+        /* // CARD UI */
+        .card { background: var(--surface); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); margin-bottom: 16px; border: 1px solid var(--border); }
+        .summary-banner { background: var(--grad); color: white; border: none; overflow: hidden; position: relative; }
 
-        .nav-item:hover { background: var(--accent-color); }
+        /* // BUTTONS */
+        .btn { border: none; padding: 14px; border-radius: 18px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; width: 100%; font-family: inherit; font-size: 0.9rem; }
+        .btn-p { background: var(--grad); color: white; }
+        .btn-s { background: var(--p-soft); color: var(--p); }
+        .icon-btn { width: 40px; height: 40px; border-radius: 12px; border: none; background: var(--p-soft); color: var(--p); cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-        .made-by {
-            padding: 20px;
-            font-size: 0.8em;
-            text-align: center;
-            opacity: 0.7;
-            margin-top: auto;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
+        /* // PROGRESS UI */
+        .progress-container { background: var(--border); height: 8px; border-radius: 10px; overflow: hidden; margin: 10px 0; }
+        .progress-fill { height: 100%; background: var(--p); transition: width 0.6s ease; }
 
-        /* --- Main Content --- */
-        #main-content {
-            flex-grow: 1;
-            padding: 20px;
-            width: 100%;
-            transition: 0.3s;
-        }
+        /* // NAVIGATION */
+        nav { position: fixed; bottom: 0; width: 100%; background: var(--surface); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0 25px 0; z-index: 100; }
+        .nav-item { border: none; background: none; color: var(--text-l); display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; gap: 5px; width: 20%; cursor: pointer; }
+        .nav-item.active { color: var(--p); font-weight: 700; }
 
-        .header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+        /* // UTILS */
+        .row-flex { display: flex; justify-content: space-between; align-items: center; }
+        .switch { position: relative; display: inline-block; width: 46px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; inset: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--p); }
+        input:checked + .slider:before { transform: translateX(22px); }
 
-        .menu-btn {
-            font-size: 24px;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .share-btn {
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .share-btn img {
-            width: 24px;
-            height: 24px;
-        }
-
-        .page { display: none; max-width: 600px; margin: 0 auto; }
-        .page.active { display: block; }
-
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            margin-bottom: 20px;
-        }
-
-        /* --- UI Elements --- */
-        input, select {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
-        }
-
-        button {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            background: var(--accent-color);
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .btn-full { width: 100%; margin-top: 10px; }
-
-        /* --- Namaz & Tables --- */
-        .namaz-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .prayer-table { width: 100%; border-collapse: collapse; }
-        .prayer-table td { padding: 12px; border-bottom: 1px solid #f0f0f0; }
-
-        /* --- Tasbeeh Overlay --- */
-        #active-counter {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: white;
-            z-index: 2000;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .count-btn {
-            width: 250px;
-            height: 250px;
-            border-radius: 50%;
-            font-size: 3em;
-            background: var(--primary-color);
-            color: white;
-            border: 10px solid var(--accent-color);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
-
-        @media (max-width: 768px) {
-            .count-btn { width: 200px; height: 200px; font-size: 2.5em; }
-        }
+        #toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 24px; border-radius: 50px; font-size: 13px; z-index: 1000; display: none; }
+        
+        .quran-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 15px; }
+        .day-box { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--p-soft); border-radius: 12px; font-size: 12px; font-weight: 700; color: var(--p); cursor: pointer; }
+        .day-box.done { background: var(--p); color: white; }
     </style>
 </head>
 <body>
 
-    <div id="sidebar">
-        <div class="sidebar-header">
-            <span>Menu</span>
-            <span onclick="toggleSidebar()" style="cursor:pointer">✕</span>
-        </div>
-        <div class="nav-item" onclick="showPage('home')">🏠 Home Dashboard</div>
-        <div class="nav-item" onclick="showPage('tasbeeh')">📿 Smart Tasbeeh</div>
-        <div class="nav-item" onclick="showPage('namaz')">🕌 Namaz Tracker</div>
-        <div class="nav-item" onclick="showPage('azkar')">☀️ Daily Azkar</div>
-        <div class="nav-item" onclick="showPage('settings')">⚙️ Advanced Settings</div>
-        <div class="nav-item" onclick="showPage('guide')">📖 How to Use</div>
-        <div class="made-by">made by Ammar Ali</div>
-    </div>
+<div id="toast"></div>
 
-    <div id="main-content">
-        <div class="header-row">
-            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-            <div class="share-btn" onclick="shareApp()">
-                <img src="share.png" alt="Share">
+<div id="app">
+    <header>
+        <div class="brand"><h1>Deen Companion <span>v1.1</span></h1></div>
+        <button class="icon-btn" onclick="shareApp()"><i class="fa-solid fa-share-nodes"></i></button>
+    </header>
+
+    <main>
+        <section id="home" class="view active">
+            <div class="card summary-banner">
+                <h2 style="margin: 0;">Assalamu Alaikum</h2>
+                <p id="h-date" style="opacity: 0.9; margin: 5px 0 0; font-size: 13px;"></p>
+                <i class="fa-solid fa-mosque" style="position: absolute; right: -10px; bottom: -10px; font-size: 5rem; opacity: 0.1;"></i>
             </div>
-        </div>
-
-        <div id="home" class="page active">
-            <div class="card" style="text-align:center;">
-                <div id="hijri-date" style="color: var(--accent-color); font-weight: bold; font-size: 1.2em;">Wednesday, Shaʻban 23, 1447 AH</div>
-                <div id="clock" style="font-size: 3em; font-weight: bold; margin: 10px 0;">00:00:00</div>
-                <table class="prayer-table" id="home-prayer-list"></table>
-                <button class="btn-full" style="background: #f39c12;" onclick="dailyReset()">Daily Reset Progress</button>
-            </div>
-        </div>
-
-        <div id="tasbeeh" class="page">
-            <div class="card">
-                <h3>Add New Tasbeeh</h3>
-                <input type="text" id="t-name" placeholder="Name (e.g. SubhanAllah)">
-                <input type="number" id="t-goal" placeholder="Target Goal">
-                <button class="btn-full" onclick="addTasbeeh()">Add Tasbeeh</button>
-            </div>
-            <div id="tasbeeh-list"></div>
-        </div>
-
-        <div id="namaz" class="page">
-            <div class="card">
-                <h2>Namaz Tracker</h2>
-                <div id="namaz-items"></div>
-                <hr>
-                <h4>Add Extra (Nafl/Tahajjud)</h4>
-                <input type="text" id="extra-name" placeholder="Prayer Name">
-                <button class="btn-full" onclick="addExtraNamaz()">Add Prayer</button>
-            </div>
-        </div>
-
-        <div id="azkar" class="page">
-            <div class="card">
-                <h3>Daily Azkar</h3>
-                <input type="text" id="azkar-input" placeholder="Enter Azkar/Dua">
-                <button class="btn-full" onclick="addAzkar()">Add to List</button>
-            </div>
-            <div id="azkar-list"></div>
-        </div>
-
-        <div id="settings" class="page">
-            <div class="card">
-                <h3>Theme Customization</h3>
-                <label>Change App Color:</label>
-                <input type="color" id="theme-picker" onchange="updateTheme(this.value)" style="height:50px;">
-                
-                <h3 style="margin-top:20px;">Adhan Settings</h3>
-                <select id="adhan-select">
-                    <option value="adhan1.mp3">Adhan Voice 1</option>
-                    <option value="adhan2.mp3">Adhan Voice 2</option>
-                    <option value="adhan3.mp3">Adhan Voice 3</option>
-                </select>
-                
-                <h3>Edit Local Times</h3>
-                <div id="edit-times"></div>
-                <button class="btn-full" onclick="saveNewTimes()">Save Local Times</button>
-            </div>
-        </div>
-
-	    <div id="guide" class="page">
-            <div class="card">
-                <h2>📖 How to Use</h2>
-                <h3>📱 Navigation & Menu</h3>
-                <p>Tap ☰ Menu to switch pages. If the menu is too long on your phone, you can scroll down inside it. The app is signed <b>"made by Ammar Ali"</b> at the bottom.</p>
-                
-                <h3>📿 Tasbeeh Counter</h3>
-                <p><b>Adding:</b> Type the name and goal. <b>Counting:</b> Tap your Tasbeeh to open the large "COUNT" button. <b>Goal Sound:</b> A sound plays ONLY when you hit your target. <b>Auto Mode:</b> Taps for you every 2 seconds.</p>
-                
-                <h3>🕌 Adhan System</h3>
-                <p>The app plays Adhan automatically at the set times. Use <b>Settings</b> to preview voices or manually adjust Fajr, Dhuhr, etc., times to match your mosque.</p>
-                
-                <h3>🏠 Home Dashboard</h3>
-                <p>View your Hijri date and live clock here. Use <b>Reset Daily Progress</b> to set your counters back to zero for a new day without deleting your Tasbeeh names.</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="active-counter">
-        <h2 id="active-t-name">Tasbeeh</h2>
-        <h1 id="active-t-count" style="font-size: 5em; margin: 20px 0;">0</h1>
-        <button class="count-btn" onclick="incrementCount()">COUNT</button>
-        <div style="margin-top: 30px; display:flex; gap:10px;">
-            <button onclick="toggleAutoMode()" id="auto-btn" style="background:#3498db">Auto Mode</button>
-            <button onclick="closeCounter()" style="background:#e74c3c">Save & Close</button>
-        </div>
-    </div>
-
-    <script>
-        let data = JSON.parse(localStorage.getItem('muslimAppData')) || {
-            theme: '#27ae60',
-            prayers: [
-                {name: 'Fajr', time: '05:35', done: false, type: 'farz'},
-                {name: 'Dhuhr', time: '12:28', done: false, type: 'farz'},
-                {name: 'Asr', time: '16:15', done: false, type: 'farz'},
-                {name: 'Maghrib', time: '17:55', done: false, type: 'farz'},
-                {name: 'Isha', time: '19:15', done: false, type: 'farz'}
-            ],
-            tasbeehs: [],
-            azkars: []
-        };
-
-        let activeIdx = null;
-        let autoTimer = null;
-
-        function save() { localStorage.setItem('muslimAppData', JSON.stringify(data)); }
-
-        function shareApp() {
-            if (navigator.share) {
-                navigator.share({ title: 'Muslim Assistant', text: 'Check out this app made by Ammar Ali!', url: window.location.href });
-            } else {
-                alert("Link copied to clipboard: " + window.location.href);
-            }
-        }
-
-        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
-        
-        function showPage(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            if(id === 'namaz') renderNamaz();
-            if(id === 'tasbeeh') renderTasbeehs();
-            if(id === 'azkar') renderAzkar();
-            if(id === 'settings') renderSettings();
-            if(window.innerWidth < 768) toggleSidebar();
-        }
-
-        function updateClock() {
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('en-GB');
-            document.getElementById('clock').innerText = timeStr;
-            if(now.getSeconds() === 0) {
-                const cur = timeStr.substring(0, 5);
-                data.prayers.forEach(p => { if(p.time === cur) new Audio(document.getElementById('adhan-select').value).play().catch(()=>{}); });
-            }
-        }
-        setInterval(updateClock, 1000);
-
-        function renderNamaz() {
-            const container = document.getElementById('namaz-items');
-            container.innerHTML = data.prayers.map((p, i) => `
-                <div class="namaz-row">
-                    <span>${p.name} ${p.type==='extra'?'(Extra)':''}</span>
-                    <div>
-                        <input type="checkbox" style="width:25px; height:25px;" ${p.done?'checked':''} onchange="data.prayers[${i}].done=!data.prayers[${i}].done; save()">
-                        ${p.type==='extra'? `<button onclick="deleteExtra(${i})" style="background:red; padding:2px 8px; margin-left:10px;">X</button>` : ''}
-                    </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="card" style="text-align: center;">
+                    <h3 id="h-namaz-stat" style="margin: 0; color: var(--p);">0/5</h3>
+                    <small>Prayers</small>
                 </div>
-            `).join('');
-            document.getElementById('home-prayer-list').innerHTML = data.prayers.filter(p=>p.type==='farz').map(p=>`<tr><td>${p.name}</td><td align="right">${p.time}</td></tr>`).join('');
+                <div class="card" style="text-align: center;">
+                    <h3 id="h-azkar-stat" style="margin: 0; color: var(--p);">0</h3>
+                    <small>Azkar Done</small>
+                </div>
+            </div>
+            <div class="card">
+                <div class="row-flex"><span>Daily Goal</span><strong id="h-prog-txt">0%</strong></div>
+                <div class="progress-container"><div id="h-prog-bar" class="progress-fill" style="width: 0%;"></div></div>
+            </div>
+        </section>
+
+        <section id="namaz" class="view">
+            <div class="card summary-banner">
+                <h3>Salah Tracker</h3>
+                <div class="progress-container" style="background: rgba(255,255,255,0.2);"><div id="n-prog-bar" class="progress-fill" style="background: var(--accent); width: 0%;"></div></div>
+            </div>
+            <div id="n-list"></div>
+        </section>
+
+        <section id="tasbeeh" class="view">
+            <div id="t-main">
+                <div class="row-flex" style="margin-bottom: 15px;"><h3>Tasbeeh</h3><button class="icon-btn" onclick="showTAdd()"><i class="fa-solid fa-plus"></i></button></div>
+                <div id="t-items"></div>
+            </div>
+
+            <div id="t-detail" style="display: none; text-align: center;">
+                <div class="row-flex" style="margin-bottom: 20px;">
+                    <button class="icon-btn" onclick="closeTDetail()"><i class="fa-solid fa-chevron-left"></i></button>
+                    <h3 style="flex:1">Counter</h3>
+                    <div style="width:40px"></div>
+                </div>
+                <div class="card">
+                    <h2 id="td-name" class="rtl" style="font-size: 2.5rem; color: var(--p); margin: 10px 0;"></h2>
+                    <div id="t-tap-circle" style="width: 240px; height: 240px; border-radius: 50%; border: 12px solid var(--p-soft); margin: 20px auto; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; background: var(--surface); box-shadow: var(--shadow);" onclick="countT()">
+                        <div id="td-count" style="font-size: 4rem; font-weight: 800; color: var(--p);">0</div>
+                        <small style="letter-spacing: 2px; color: var(--text-l);">TAP</small>
+                    </div>
+                    
+                    <div style="margin: 20px 0; padding: 10px; background: var(--p-soft); border-radius: 15px;">
+                        <div class="row-flex"><small>Auto Speed</small><small id="speed-val" style="font-weight:700">1.0s</small></div>
+                        <input type="range" id="t-speed" min="0.2" max="3.0" step="0.1" value="1.0" style="width:100%; accent-color:var(--p)" oninput="updateSpeed(this.value)">
+                    </div>
+
+                    <div class="row-flex" style="gap: 10px;">
+                        <button class="btn btn-s" onclick="resetT()">Reset</button>
+                        <button id="t-auto-btn" class="btn btn-p" onclick="toggleTAuto()"><i class="fa-solid fa-play"></i> Auto Mode</button>
+                    </div>
+                    <div class="progress-container" style="margin-top: 25px;"><div id="td-prog" class="progress-fill" style="width: 0%;"></div></div>
+                    <small id="td-target-txt" style="color: var(--text-l);"></small>
+                </div>
+            </div>
+        </section>
+
+        <section id="azkar" class="view">
+            <div class="row-flex" style="margin-bottom: 15px;"><h3>Azkar</h3><button class="btn btn-p" style="width:auto" onclick="showAzAdd()">+ Add</button></div>
+            <div id="az-list"></div>
+        </section>
+
+        <section id="quran" class="view">
+            <div class="card summary-banner"><h3>Quran Challenge</h3><div class="progress-container" style="background: rgba(255,255,255,0.2);"><div id="q-prog-bar" class="progress-fill" style="background: var(--accent); width: 0%;"></div></div></div>
+            <div class="card">
+                <div class="row-flex"><span>Read Pages:</span><input type="number" id="q-input" value="20" style="width:70px; padding:8px; border-radius:10px; border:1px solid var(--border)"><button class="btn btn-p" style="width:auto; padding:8px 15px" onclick="addQuranPages()">Update</button></div>
+            </div>
+            <div class="card">
+                <div class="row-flex"><strong>30 Day Streak</strong><button class="btn btn-s" style="padding:5px 10px; color:red" onclick="resetQuran()">Reset</button></div>
+                <div class="quran-grid" id="q-grid"></div>
+            </div>
+        </section>
+    </main>
+
+    <nav>
+        <button class="nav-item active" onclick="navigate('home')" id="nav-home"><i class="fa-solid fa-house"></i><span>Home</span></button>
+        <button class="nav-item" onclick="navigate('namaz')" id="nav-namaz"><i class="fa-solid fa-kaaba"></i><span>Namaz</span></button>
+        <button class="nav-item" onclick="navigate('tasbeeh')" id="nav-tasbeeh"><i class="fa-solid fa-beads"></i><span>Tasbeeh</span></button>
+        <button class="nav-item" onclick="navigate('azkar')" id="nav-azkar"><i class="fa-solid fa-book"></i><span>Azkar</span></button>
+        <button class="nav-item" onclick="navigate('quran')" id="nav-quran"><i class="fa-solid fa-book-open"></i><span>Quran</span></button>
+    </nav>
+</div>
+
+<div id="modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+    <div class="card" style="width: 90%; max-width: 400px;">
+        <h3 id="m-title"></h3>
+        <div id="m-body"></div>
+        <div class="row-flex" style="gap: 10px; margin-top: 20px;">
+            <button class="btn btn-s" onclick="closeM()">Cancel</button>
+            <button class="btn btn-p" id="m-confirm">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // // STATE INITIALIZATION
+    let state = {
+        namaz: { Fajr: {d:false, n:0}, Dhuhr: {d:false, n:0}, Asr: {d:false, n:0}, Maghrib: {d:false, n:0}, Isha: {d:false, n:0} },
+        tasbeehs: [{ id: 1, name: "SubhanAllah", ar: "سُبْحَانَ ٱللَّٰهِ", c: 0, t: 33 }],
+        azkar: [],
+        quran: { read: 0, days: [] },
+        lastVisit: new Date().toDateString(),
+        activeTId: null
+    };
+
+    let tInterval = null;
+    let autoSpeed = 1000;
+
+    function init() {
+        const saved = localStorage.getItem('deen_v11_final');
+        if (saved) state = JSON.parse(saved);
+        
+        // Reset daily tasks if new day
+        if (state.lastVisit !== new Date().toDateString()) {
+            Object.keys(state.namaz).forEach(k => state.namaz[k].d = false);
+            state.tasbeehs.forEach(t => t.c = 0);
+            state.lastVisit = new Date().toDateString();
         }
 
-        function addExtraNamaz() {
-            const name = document.getElementById('extra-name').value;
-            if(name) { data.prayers.push({name, time: '--:--', done: false, type: 'extra'}); save(); renderNamaz(); document.getElementById('extra-name').value=''; }
-        }
-        function deleteExtra(i) { data.prayers.splice(i,1); save(); renderNamaz(); }
+        renderNamaz(); renderTasbeeh(); renderAzkar(); renderQuran(); updateHome();
+        document.getElementById('h-date').innerText = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+    }
 
-        function renderTasbeehs() {
-            const list = document.getElementById('tasbeeh-list');
-            list.innerHTML = data.tasbeehs.map((t, i) => `
-                <div class="card" onclick="openCounter(${i})" style="display:flex; justify-content:space-between; align-items:center;">
-                    <b>${t.name}</b>
-                    <span>${t.count} / ${t.goal}</span>
-                    <button onclick="deleteTasbeeh(${i}, event)" style="background:red;">Delete</button>
-                </div>`).join('');
-        }
-        function addTasbeeh() {
-            const name = document.getElementById('t-name').value, goal = document.getElementById('t-goal').value;
-            if(name && goal) { data.tasbeehs.push({name, goal, count: 0}); save(); renderTasbeehs(); document.getElementById('t-name').value=''; document.getElementById('t-goal').value=''; }
-        }
-        function openCounter(i) {
-            activeIdx = i;
-            document.getElementById('active-t-name').innerText = data.tasbeehs[i].name;
-            document.getElementById('active-t-count').innerText = data.tasbeehs[i].count;
-            document.getElementById('active-counter').style.display = 'flex';
-        }
-        function incrementCount() {
-            data.tasbeehs[activeIdx].count++;
-            document.getElementById('active-t-count').innerText = data.tasbeehs[activeIdx].count;
-            if(data.tasbeehs[activeIdx].count == data.tasbeehs[activeIdx].goal) { alert("Goal Reached!"); if(autoTimer) toggleAutoMode(); }
-        }
-        function toggleAutoMode() {
-            const btn = document.getElementById('auto-btn');
-            if(autoTimer) { clearInterval(autoTimer); autoTimer = null; btn.innerText = "Auto Mode"; btn.style.background = "#3498db"; }
-            else { autoTimer = setInterval(incrementCount, 2000); btn.innerText = "STOP AUTO"; btn.style.background = "red"; }
-        }
-        function closeCounter() { if(autoTimer) toggleAutoMode(); save(); renderTasbeehs(); document.getElementById('active-counter').style.display = 'none'; }
-        function deleteTasbeeh(i, e) { e.stopPropagation(); data.tasbeehs.splice(i, 1); save(); renderTasbeehs(); }
+    function save() {
+        localStorage.setItem('deen_v11_final', JSON.stringify(state));
+        updateHome();
+    }
 
-        function renderAzkar() {
-            document.getElementById('azkar-list').innerHTML = data.azkars.map((a, i) => `<div class="card" style="display:flex; justify-content:space-between;"><span>${a}</span><button onclick="data.azkars.splice(${i},1); save(); renderAzkar();" style="background:red">X</button></div>`).join('');
-        }
-        function addAzkar() {
-            const val = document.getElementById('azkar-input').value;
-            if(val) { data.azkars.push(val); document.getElementById('azkar-input').value=''; save(); renderAzkar(); }
-        }
+    function navigate(id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('nav-' + id).classList.add('active');
+    }
 
-        function renderSettings() {
-            document.getElementById('edit-times').innerHTML = data.prayers.filter(p=>p.type==='farz').map((p, i) => `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>${p.name}</span><input type="time" id="time-${i}" value="${p.time}" style="width:120px;"></div>`).join('');
-            document.getElementById('theme-picker').value = data.theme;
-        }
-        function saveNewTimes() {
-            data.prayers.filter(p=>p.type==='farz').forEach((p, i) => { p.time = document.getElementById(`time-${i}`).value; });
-            save(); renderNamaz(); alert("Settings Saved!");
-        }
-        function updateTheme(color) { data.theme = color; document.documentElement.style.setProperty('--primary-color', color); save(); }
-        function dailyReset() { if(confirm("Reset progress?")) { data.prayers.forEach(p=>p.done=false); data.tasbeehs.forEach(t=>t.count=0); save(); renderNamaz(); renderTasbeehs(); } }
+    function showToast(m) {
+        const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block';
+        setTimeout(() => t.style.display = 'none', 2000);
+    }
 
-        document.documentElement.style.setProperty('--primary-color', data.theme);
-        renderNamaz();
-        renderTasbeehs();
-        renderAzkar();
-    </script>
+    // // HOME DASHBOARD LOGIC
+    function updateHome() {
+        const nDone = Object.values(state.namaz).filter(x => x.d).length;
+        const aDone = state.azkar.filter(a => a.c >= a.t).length;
+        document.getElementById('h-namaz-stat').innerText = `${nDone}/5`;
+        document.getElementById('h-azkar-stat').innerText = aDone;
+        
+        const totalItems = 5 + state.azkar.length;
+        const progress = Math.round(((nDone + aDone) / (totalItems || 1)) * 100);
+        document.getElementById('h-prog-txt').innerText = progress + "%";
+        document.getElementById('h-prog-bar').style.width = progress + "%";
+    }
+
+    // // NAMAZ LOGIC
+    function renderNamaz() {
+        const list = document.getElementById('n-list'); list.innerHTML = '';
+        Object.keys(state.namaz).forEach(p => {
+            const data = state.namaz[p];
+            const div = document.createElement('div'); div.className = 'card';
+            div.innerHTML = `
+                <div class="row-flex">
+                    <strong>${p}</strong>
+                    <label class="switch"><input type="checkbox" ${data.d?'checked':''} onchange="toggleN('${p}', this.checked)"><span class="slider"></span></label>
+                </div>
+                <div class="row-flex" style="margin-top:12px; font-size:12px; color:var(--text-l)">
+                    <span>Nafl Rakats</span>
+                    <div style="display:flex; gap:8px; align-items:center">
+                        <button class="icon-btn" style="width:25px; height:25px" onclick="adjNafl('${p}',-1)">-</button>
+                        <b style="color:var(--text)">${data.n}</b>
+                        <button class="icon-btn" style="width:25px; height:25px" onclick="adjNafl('${p}',1)">+</button>
+                    </div>
+                </div>`;
+            list.appendChild(div);
+        });
+        document.getElementById('n-prog-bar').style.width = (Object.values(state.namaz).filter(x=>x.d).length/5*100) + '%';
+    }
+    function toggleN(p,v) { state.namaz[p].d = v; save(); renderNamaz(); if(v) showToast(p + " Done!"); }
+    function adjNafl(p,v) { state.namaz[p].n = Math.max(0, state.namaz[p].n + v); save(); renderNamaz(); }
+
+    // // TASBEEH LOGIC
+    function renderTasbeeh() {
+        const container = document.getElementById('t-items'); container.innerHTML = '';
+        state.tasbeehs.forEach(t => {
+            const div = document.createElement('div'); div.className = 'card row-flex';
+            div.onclick = () => openTDetail(t.id);
+            div.innerHTML = `<div class="icon-btn" style="background:var(--p); color:white">${t.c}</div><div style="text-align:right"><div class="rtl" style="font-size:1.2rem">${t.ar}</div><small>${t.name}</small></div><button class="icon-btn" style="background:none; color:red" onclick="deleteT(${t.id}); event.stopPropagation()"><i class="fa-solid fa-trash"></i></button>`;
+            container.appendChild(div);
+        });
+    }
+    function openTDetail(id) {
+        state.activeTId = id; const t = state.tasbeehs.find(x => x.id === id);
+        document.getElementById('t-main').style.display = 'none'; document.getElementById('t-detail').style.display = 'block';
+        document.getElementById('td-name').innerText = t.ar; updateTD();
+    }
+    function closeTDetail() { if(tInterval) toggleTAuto(); document.getElementById('t-main').style.display = 'block'; document.getElementById('t-detail').style.display = 'none'; renderTasbeeh(); }
+    
+    function countT() {
+        const t = state.tasbeehs.find(x => x.id === state.activeTId);
+        if(t.c >= t.t) { if(tInterval) toggleTAuto(); showToast("Goal Reached!"); return; }
+        t.c++; 
+        const el = document.getElementById('td-count');
+        el.style.transform = "scale(1.2)"; setTimeout(()=>el.style.transform="scale(1)", 100);
+        if(navigator.vibrate) navigator.vibrate(40);
+        save(); updateTD();
+    }
+    function updateTD() {
+        const t = state.tasbeehs.find(x => x.id === state.activeTId);
+        document.getElementById('td-count').innerText = t.c;
+        document.getElementById('td-prog').style.width = Math.min(t.c/t.t*100, 100) + '%';
+        document.getElementById('td-target-txt').innerText = `Target: ${t.t}`;
+    }
+    function updateSpeed(v) { autoSpeed = v * 1000; document.getElementById('speed-val').innerText = v + 's'; if(tInterval) { clearInterval(tInterval); tInterval = setInterval(countT, autoSpeed); } }
+    function toggleTAuto() {
+        const b = document.getElementById('t-auto-btn');
+        const circle = document.getElementById('t-tap-circle');
+        if(tInterval) { clearInterval(tInterval); tInterval = null; b.innerHTML = '<i class="fa-solid fa-play"></i> Auto Mode'; circle.style.borderColor = "var(--p-soft)"; }
+        else { tInterval = setInterval(countT, autoSpeed); b.innerHTML = '<i class="fa-solid fa-stop"></i> Stop'; circle.style.borderColor = "var(--p)"; }
+    }
+    function resetT() { if(confirm("Reset counter?")) { state.tasbeehs.find(x=>x.id===state.activeTId).c = 0; save(); updateTD(); } }
+    function showTAdd() {
+        document.getElementById('m-title').innerText = "New Tasbeeh";
+        document.getElementById('m-body').innerHTML = `<input type="text" id="mt-ar" class="rtl" placeholder="Arabic Text" style="width:100%; padding:12px; margin-bottom:10px; border-radius:12px; border:1px solid var(--border)"><input type="number" id="mt-t" placeholder="Goal (e.g. 33)" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--border)">`;
+        document.getElementById('modal').style.display = 'flex';
+        document.getElementById('m-confirm').onclick = () => {
+            const ar = document.getElementById('mt-ar').value; const t = parseInt(document.getElementById('mt-t').value) || 33;
+            if(ar) { state.tasbeehs.push({id: Date.now(), ar, c:0, t, name:"Custom"}); save(); renderTasbeeh(); closeM(); }
+        };
+    }
+    function deleteT(id) { state.tasbeehs = state.tasbeehs.filter(x => x.id !== id); save(); renderTasbeeh(); }
+
+    // // AZKAR LOGIC
+    function renderAzkar() {
+        const list = document.getElementById('az-list'); list.innerHTML = '';
+        state.azkar.forEach((a, i) => {
+            const div = document.createElement('div'); div.className = 'card';
+            div.innerHTML = `<div class="row-flex"><span class="rtl" style="font-size:1.3rem">${a.ar}</span><button class="icon-btn" style="background:none; color:red" onclick="deleteAz(${i})"><i class="fa-solid fa-trash"></i></button></div>
+            <div class="row-flex" style="margin-top:15px"><div style="display:flex; gap:10px; align-items:center"><button class="icon-btn" onclick="adjAz(${i},-1)">-</button><div class="icon-btn" style="background:var(--p); color:white; width:50px">${a.c}</div><button class="icon-btn" onclick="adjAz(${i},1)">+</button></div><small>Goal: ${a.t}</small></div>`;
+            list.appendChild(div);
+        });
+    }
+    function showAzAdd() {
+        document.getElementById('m-title').innerText = "Add Zikr";
+        document.getElementById('m-body').innerHTML = `<input type="text" id="ma-ar" class="rtl" style="width:100%; padding:12px; margin-bottom:10px; border-radius:12px; border:1px solid var(--border)"><input type="number" id="ma-t" placeholder="Goal" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--border)">`;
+        document.getElementById('modal').style.display = 'flex';
+        document.getElementById('m-confirm').onclick = () => {
+            const ar = document.getElementById('ma-ar').value; const t = parseInt(document.getElementById('ma-t').value) || 33;
+            if(ar) { state.azkar.push({ar, c:0, t}); save(); renderAzkar(); closeM(); }
+        };
+    }
+    function adjAz(i,v) { state.azkar[i].c = Math.max(0, state.azkar[i].c + v); save(); renderAzkar(); }
+    function deleteAz(i) { state.azkar.splice(i,1); save(); renderAzkar(); }
+
+    // // QURAN LOGIC
+    function renderQuran() {
+        document.getElementById('q-prog-bar').style.width = (state.quran.read/604*100) + '%';
+        const grid = document.getElementById('q-grid'); grid.innerHTML = '';
+        for(let i=1; i<=30; i++) {
+            const d = document.createElement('div'); d.className = `day-box ${state.quran.days.includes(i)?'done':''}`;
+            d.innerText = i; d.onclick = () => {
+                if(state.quran.days.includes(i)) state.quran.days = state.quran.days.filter(x=>x!==i);
+                else state.quran.days.push(i); save(); renderQuran();
+            };
+            grid.appendChild(d);
+        }
+    }
+    function addQuranPages() { state.quran.read = Math.min(604, state.quran.read + (parseInt(document.getElementById('q-input').value)||0)); save(); renderQuran(); }
+    function resetQuran() { if(confirm("Reset Quran progress?")) { state.quran = {read:0, days:[]}; save(); renderQuran(); } }
+
+    // // UTILS
+    function closeM() { document.getElementById('modal').style.display = 'none'; }
+    function shareApp() { if(navigator.share) navigator.share({title:'Deen Companion', url:window.location.href}); else showToast("Link Copied!"); }
+
+    init();
+</script>
+
 </body>
 </html>
